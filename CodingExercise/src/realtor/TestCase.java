@@ -13,6 +13,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Parameters;
 import realtor.Utils;
@@ -56,32 +57,32 @@ public class TestCase extends Utils {
 		driver.get("http://realtor.com");
 		
 		//Enter “Morgantown, WV” into the search box.
-		WebElement searchBox = driver.findElement(By.id("searchBox"));
+		WebElement searchBox = HomePage.searchBox(driver);
 		clearField(searchBox);
-		sendKeys(searchBox,"Morgantown, WV");
+		sendKeys(searchBox,"Morgantown, WV");	
+		
 		
 		//Hit Enter
-		WebElement searchButton = driver.findElement(By.cssSelector("[type='button'][class='btn btn-primary js-searchButton']"));
+		WebElement searchButton = HomePage.searchButton(driver);
 		click(searchButton);
-		waitURL(driver);
+		String pageTitle = "Morgantown, WV Real Estate - Morgantown Homes for Sale - realtor.com®";
+		waitURL(driver,pageTitle);
 		
 		//Verify that number N in “[N] Homes sorted by Relevant Listings” located above the
 		//search results is greater than 0.
-		String numberOfHouse =driver.findElement(By.id("srp-sort-count-wrap")).findElement(By.tagName("span")).getText();
+		String numberOfHouse =Listings.numberOfHouse(driver).getText();
 		String[] numHouse = numberOfHouse.split(" ");
 		Integer num = Integer.parseInt(numHouse[0]);
 		assertTrue(num>0);
 		
 		
-		String expPrice= driver.findElement(By.id("2")).findElement(By.cssSelector("[class='srp-item-price']")).getText();
+		String expPrice= Listings.expPrice(driver).getText();
 		
 		//Click on the Address of the second search result
-		WebElement addressURL = driver.findElement(By.id("2")).findElement(By.cssSelector("[class='srp-item-address ellipsis']")).findElement(By.tagName("a"));
+		WebElement addressURL =  Listings.addressURL(driver) ;
 		click(addressURL);
-		waitURL(driver);
 		
-		
-		String actPrice = driver.findElement(By.xpath("//div[@itemtype='http://schema.org/Offer']/span[@itemprop='price']")).getText();
+		String actPrice = Apartment.actPrice(driver).getText();
 		
 		if(driver instanceof EdgeDriver){
 			actPrice = removeLastChar(actPrice);
